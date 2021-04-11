@@ -35,6 +35,11 @@ public:
     {
         return side1 + side2 + side3;
     }
+    // calculate sum of squares
+    double sumOfSquares() const
+    {
+        return pow(area(),2) + pow(perimeter(),2);
+    }
     // determine is Isosceles or is not Triangle
     bool isIsoscelesTriangle()
     {

@@ -17,11 +17,16 @@ public:
     double area() const{
         return M_PI * _semiMajorAxes * _semiMinorAxes;
     }
-    // calculate perimeter
+    // calculate perimeter 
+    // perimeter formula: 2π * semiMinorAxes + 4(semiMajorAxes-semiMinorAxes)
     double perimeter() const{
         return 2 * M_PI * _semiMinorAxes + 4 * (_semiMajorAxes-_semiMinorAxes);
-    } // perimeter formula: 2π * semiMinorAxes + 4(semiMajorAxes-semiMinorAxes)
-
+    } 
+    // calculate sum of squares
+    double sumOfSquares() const
+    {
+        return pow(area(),2) + pow(perimeter(),2);
+    }
 private:
     double _semiMajorAxes;
     double _semiMinorAxes;
