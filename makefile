@@ -1,21 +1,13 @@
-.PHONY: clean run mkdir
+.PHONY: clean mkdir
 BIN=bin
 SRC=src
 TEST=test
 
-all: clean mkdir hw3 geo execute
-hw3:  $(TEST)/ut_main.cpp $(TEST)/ut_sort.h $(SRC)/shape.h $(SRC)/ellipse.h $(SRC)/triangle.h $(SRC)/circular_sector.h $(SRC)/sort.h $(SRC)/terminal.h
+all: clean mkdir hw4 
+hw4:  $(TEST)/ut_main.cpp $(TEST)/ut_node.h $(SRC)/file.h $(SRC)/folder.h $(SRC)/node.h 
 		g++ -std=c++11 -Wfatal-errors $(TEST)/ut_main.cpp -o $(BIN)/ut_all  -lgtest -lpthread
 
-geo: $(SRC)/main.cpp $(TEST)/ut_sort.h $(SRC)/shape.h $(SRC)/ellipse.h $(SRC)/triangle.h $(SRC)/circular_sector.h $(SRC)/sort.h $(SRC)/terminal.h
-		g++ -std=c++11 -Wfatal-errors $(SRC)/main.cpp -o $(BIN)/geo  -lgtest -lpthread
-
-execute:
-		bin/geo input.txt output.txt area inc
-
 clean:
-		rm -f $(BIN)/* rm -f output.txt
-run:
-		$(BIN)/ut_all
+		rm -f $(BIN)/* 
 mkdir:
 		mkdir -p $(BIN)
