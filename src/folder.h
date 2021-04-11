@@ -1,81 +1,86 @@
 #ifndef FOLDER_H
 #define FOLDER_H
 
-#include <string>
-#include <sys/stat.h>
-#include <vector>
-#include <map>
 #include "node.h"
-#include "iterator.h"
 
-using namespace std;
+class Folder: public Node
+{
+    public:
+        class FolderIterator: public NodeIterator
+        {
+            public:
+                FolderIterator(Folder* folder):_folder(folder)
+                {
+                }
 
-class Folder: public Node {
-public:
-  class FolderIterator:public Iterator {
-  public:
-    FolderIterator(Folder * f): _f(f) {}
-    // initialization
-    void first() {
-      _current = _f->_map.begin();
-    }
-    // if iterator is to the end that it should throw string "No current item!"
-    // if iterator is not to the end that it should return current node
-    Node * currentItem() {
-      if (isDone()) throw string("No current item!");
-      return (*_current).second;
-    }
-    // if iterator is to the end that it should throw string "Moving past the end!"
-    // if iterator is not to the end that it should add 1
-    void next() {
-      if (isDone()) throw string("Moving past the end!");
-      ++_current;
-    }
-    // return iterator is to the end or not?
-    bool isDone() {
-      return _current == _f->_map.end();
-    }
-  private:
-    Folder * _f;
-    map<string,Node *>::iterator _current;
-  };
+                void first()
+                {
+                    _iter = _folder->_children.begin();
+                }
 
-public:
-  Folder(std::string path): Node(path) {
-    lstat(path.c_str(), &_st);
-    if (!S_ISDIR(_st.st_mode)) 
-    {
-      throw string("It is not Folder!");
-    }
+                Node* currentItem()
+                {
+                    if (this->isDone())
+                    {
+                        throw std::string("no current item");
+                    }
+                    return _iter->second;
+                }
 
+                void next()
+                {
+                    if (this->isDone())
+                    {
+                        throw std::string("moving past the end");
+                    }
+                    _iter++;
+                }
 
-  }
+                bool isDone()
+                {
+                    return _iter == _folder->_children.end();
+                }
+            private:
+                Folder* _folder;
+                std::map<std::string, Node*>::iterator _iter;
+        };
 
-  void addChild(Node* child) {
-    string fileName = child->getName();
-    _map.insert(pair<string,Node *>(fileName,child));
-  }
-  int numberOfChildren()
-  {
-    return _map.size();
-  }
-  Iterator * createIterator() {
-    return new FolderIterator(this);
-  }
-  map<string,Node *> getMap() {
-    return _map;
-  }
-  void accept(Visitor* visitor)
-  {
-    visitor->clearResult();
-    visitor->visitFolder(this);
-  }
-  void acceptChild(Visitor* visitor)
-  {
-    visitor->visitFolder(this);
-  }
-private:
-  struct stat _st;
-  map<string,Node *> _map;
+        Folder(const char* path):Node(path)
+        {
+            struct stat st;
+            if (lstat(path, &st) == 0 && !S_ISDIR(st.st_mode))
+            {
+                throw std::string("Do no indicate the file path.");
+            }
+        }
+
+        void add(Node* node)
+        {
+            _children.insert(std::pair<std::string, Node*>(node->name(), node));
+            node->setParent(this);
+        }
+
+        int numberOfChildren()
+        {
+            return _children.size();
+        }
+
+        void accept(NodeVisitor* nodeVisitor)
+        {
+            nodeVisitor->clearResult();
+            nodeVisitor->visitFolder(this);
+        }
+
+        void acceptChild(NodeVisitor* nodeVisitor)
+        {
+            nodeVisitor->visitFolder(this);
+        }
+
+        NodeIterator* createIterator()
+        {
+            return new FolderIterator(this);
+        }
+    private:
+        std::map<std::string, Node*> _children;
 };
 #endif

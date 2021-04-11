@@ -1,37 +1,35 @@
 #ifndef FILE_H
 #define FILE_H
 
-#include <string>
-#include <sys/stat.h>
-#include "iterator.h"
 #include "node.h"
 #include "null_iterator.h"
-using namespace std;
-class File: public Node {
-public:
-  File(std::string path): Node(path) {
-    lstat(path.c_str(), &_st);
-    if (!S_ISREG (_st.st_mode) )
-    {
-      throw string("It is not File!");
-    }
 
-  }
-  Iterator * createIterator() 
-  {
-    return new NullIterator();
-  }
-  void accept(Visitor* visitor)
-  {
-    visitor->clearResult();
-    visitor->visitFile(this);
-  }
-  void acceptChild(Visitor* visitor)
-  {
-    visitor->visitFile(this);
-  }
-private:
-  struct stat _st;
+class File: public Node
+{
+    public:
+        File(const char* path):Node(path)
+        {
+            struct stat st;
+            if (lstat(path, &st) == 0 && !S_ISREG(st.st_mode))
+            {
+                throw std::string("Do no indicate the file path.");
+            }
+        }
+        
+        void accept(NodeVisitor* nodeVisitor)
+        {
+            nodeVisitor->clearResult();
+            nodeVisitor->visitFile(this);
+        }
+
+        void acceptChild(NodeVisitor* nodeVisitor)
+        {
+            nodeVisitor->visitFile(this);
+        }
+
+        NodeIterator* createIterator()
+        {
+            return new NullIterator();
+        }
 };
-
 #endif

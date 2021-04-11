@@ -1,18 +1,48 @@
-.PHONY: clean mkdir
-BIN=bin
-SRC=src
-TEST=test
-OBJ=obj
-all: clean mkdir $(BIN)/ut_all $(OBJ)
-$(BIN)/ut_all:  $(TEST)/ut_main.cpp $(TEST)/ut_fs.h $(SRC)/link.h $(SRC)/file.h $(SRC)/folder.h $(SRC)/node.h $(SRC)/iterator.h $(SRC)/null_iterator.h $(SRC)/visitor.h obj/filesystem_builder.o
-		g++ -std=c++11 -Wfatal-errors -o $(BIN)/ut_all $(TEST)/ut_main.cpp obj/filesystem_builder.o -lgtest -lpthread
+.PHONY: clean
 
-obj/filesystem_builder.o: src/filesystem_builder.cpp src/filesystem_builder.h
-	g++ -std=c++11 -Wfatal-errors -c src/filesystem_builder.cpp -o obj/filesystem_builder.o
-$(OBJ):obj/filesystem_builder.o 
-clean: 
-		rm -f $(BIN)/* 
-		rm -f $(OBJ)/*
-mkdir:
-		mkdir -p $(BIN)
-		mkdir -p $(OBJ)
+all: clean dict bin/hw8
+
+bin/hw8: src/tree_test.cpp src/tree_test.h src/tree_frame.h src/node_model.h src/subject.h src/observer.h src/node.h src/file.h src/folder.h src/link.h src/node_iterator.h src/null_iterator.h src/node_builder.h
+	g++ -std=c++11 $< `wx-config --libs` `wx-config --cxxflags` -o $@ -lpthread
+
+bin/hw7: test/ut_fs.cpp test/ut_fs.h src/node.h src/file.h src/folder.h src/link.h src/node_iterator.h src/null_iterator.h src/node_builder.h src/node_visitor.h obj/find_node_by_pathname_visitor.o obj/find_link_visitor.o obj/find_visitor.o obj/info_content_visitor.o
+ifeq ($(OS), Windows_NT)
+	g++ -std=c++11 obj/find_node_by_pathname_visitor.o obj/find_link_visitor.o obj/find_visitor.o obj/info_content_visitor.o $< -o $@ -lgtest
+else
+	g++ -std=c++11 obj/find_node_by_pathname_visitor.o obj/find_link_visitor.o obj/find_visitor.o obj/info_content_visitor.o $< -o $@ -lgtest -lpthread
+endif
+
+obj/find_node_by_pathname_visitor.o: src/find_node_by_pathname_visitor.cpp src/find_node_by_pathname_visitor.h
+ifeq ($(OS), Windows_NT)
+	g++ -std=c++11 -c $< -o $@ -lgtest
+else
+	g++ -std=c++11 -c $< -o $@ -lgtest -lpthread
+endif
+
+obj/find_link_visitor.o: src/find_link_visitor.cpp src/find_link_visitor.h
+ifeq ($(OS), Windows_NT)
+	g++ -std=c++11 -c $< -o $@ -lgtest
+else
+	g++ -std=c++11 -c $< -o $@ -lgtest -lpthread
+endif
+
+obj/find_visitor.o: src/find_visitor.cpp src/find_visitor.h
+ifeq ($(OS), Windows_NT)
+	g++ -std=c++11 -c $< -o $@ -lgtest
+else
+	g++ -std=c++11 -c $< -o $@ -lgtest -lpthread
+endif
+
+obj/info_content_visitor.o: src/info_content_visitor.cpp src/info_content_visitor.h
+ifeq ($(OS), Windows_NT)
+	g++ -std=c++11 -c $< -o $@ -lgtest
+else
+	g++ -std=c++11 -c $< -o $@ -lgtest -lpthread
+endif
+
+dict:
+	mkdir -p bin obj
+
+clean:
+	rm -f bin/*
+	rm -f obj/*
