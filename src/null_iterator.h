@@ -3,7 +3,6 @@
 
 #include <string>
 #include "iterator.h"
-
 using namespace std;
 
 class NullIterator:public Iterator

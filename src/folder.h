@@ -42,21 +42,40 @@ public:
 
 public:
   Folder(std::string path): Node(path) {
+    lstat(path.c_str(), &_st);
+    if (!S_ISDIR(_st.st_mode)) 
+    {
+      throw string("It is not Folder!");
+    }
+
+
   }
 
   void addChild(Node* child) {
     string fileName = child->getName();
     _map.insert(pair<string,Node *>(fileName,child));
   }
-
+  int numberOfChildren()
+  {
+    return _map.size();
+  }
   Iterator * createIterator() {
     return new FolderIterator(this);
   }
   map<string,Node *> getMap() {
     return _map;
   }
-
+  void accept(Visitor* visitor)
+  {
+    visitor->clearResult();
+    visitor->visitFolder(this);
+  }
+  void acceptChild(Visitor* visitor)
+  {
+    visitor->visitFolder(this);
+  }
 private:
+  struct stat _st;
   map<string,Node *> _map;
 };
 #endif
