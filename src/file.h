@@ -3,7 +3,7 @@
 
 #include <string>
 #include <sys/stat.h>
-
+#include "iterator.h"
 #include "node.h"
 #include "null_iterator.h"
 using namespace std;

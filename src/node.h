@@ -41,6 +41,10 @@ public:
   {
     return _name;
   }
+  string name()
+  {
+    return _name;
+  }
   // Getter!
   // return node path
   string getPath()

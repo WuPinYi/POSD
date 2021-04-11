@@ -9,7 +9,7 @@ using namespace std;
 class Link: public Node{
 public:
   // You should check path if it is not a link that you should throw string "It is not Link!"
-  Link(string path, Node* node):Node(path){
+  Link(string path,  Node* node = nullptr):Node(path){
     lstat(path.c_str(), &_st);
     if(!S_ISLNK(_st.st_mode))
     {
