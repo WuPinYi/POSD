@@ -2,65 +2,43 @@
 #define NODE_H
 
 #include <string>
-#include <vector>
-#include <regex>
 #include <sys/stat.h>
+#include "iterator.h"
+#include <vector>
+
 using namespace std;
 
 class Node {
 public:
   Node(string path): _path(path) {
     stat(_path.c_str(), &_st);
-    if(stat(_path.c_str(), &_st)!=0) {
-      throw string("Node is not exist!");
-    }
+  }
+
+  virtual ~Node(){}
+
+  int size() {
+    return _st.st_size;
+  }
+
+  virtual void addChild(Node* child) {
+    throw(string("Invalid add!"));
+  }
+  virtual Iterator *createIterator() = 0;
+  string getName()
+  {
+    vector<string> _namePath;
+    _namePath = split(_path, "/");
+    return _namePath[_namePath.size()-1];
   }
   string path()
   {
     return _path;
   }
-  // For example path:"test/TA_folder/hello.txt"
-  // "hello.txt" is name
-  // Return "hello.txt"
-  string name()
-  {
-    // _path = "test/test_folder/hello.txt";
-    vector<string> _namePath;
-    _namePath = split(_path, "/");
-    return _namePath[_namePath.size()-1];
-  }
-  // implementation findNode
-  // folder->findNode(name) that should find all nodes(include child nodes and all offspring) under it. 
-  // file->findNode(name) that should find itself.
-  // if find two nodes or more than two nodes.
-  // Result should be separated by '\n'.
-  virtual string findNode(string name)
-  {
-    return "";
-      
-  }
-  virtual void addChild(Node* child) {
-    throw string("Invalid add!");
-  }
 
-  virtual Node* getChild(int num) {
-    return nullptr;
-  }
-
-  virtual string find(string name)
-  {
-    return "";
-  }
-
-  virtual string listNode()
-  {
-      return "";
-  }
 
 private:
   string _path;
   struct stat _st;
-
   // split
   vector<string> split(const string& str, const string& delim) 
   {
