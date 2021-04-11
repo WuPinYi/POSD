@@ -4,6 +4,7 @@
 #include "../src/ellipse.h"
 #include "../src/triangle.h"
 #include "../src/sort.h"
+#include "../src/terminal.h"
 #include <algorithm>
 
 using namespace std;
@@ -249,4 +250,74 @@ TEST (SortTest, QuickSortPerimeterDescendingByObject)
   ASSERT_NEAR(51.415,(*shapes)[0]->perimeter(),0.001);
   ASSERT_NEAR(26.849,(*shapes)[1]->perimeter(),0.001);
   ASSERT_NEAR(10.242,(*shapes)[2]->perimeter(),0.001);
+}
+
+TEST(TerminalTest, InvalidArgument) {
+    Terminal* test = new Terminal("Ellipse (6,5) Triangle (3,0,0,2,-3,0) CircularSector (8,40) area inc !@#$%%");
+    ASSERT_EQ("[6.000000, 22.340214, 94.247780]", test->showResult());
+}
+
+TEST(TerminalTest, InputLowercase) {
+    Terminal* t = new Terminal("Ellipse (6,5) triangle (3,0,0,2,-3,0) CircularSector (8,40) area inc");
+    ASSERT_EQ("[22.340214, 94.247780]", t->showResult());
+}
+
+TEST(TerminalTest, InputWithSpace) {
+    Terminal* t = new Terminal("Ellipse (6  ,   5) Triangle (3  ,0    ,  0  , 2,  -3,0) CircularSector (8  ,  40) area inc");
+    ASSERT_EQ("[6.000000, 22.340214, 94.247780]", t->showResult());
+}
+
+TEST(TerminalTest, AreaDescending) {
+    Terminal* test = new Terminal("Triangle (-2,0,0,3,2,0) Triangle (-2,0,0,6,2,0) area dec");
+    ASSERT_EQ("[12.000000, 6.000000]", test->showResult());
+}
+
+TEST(TerminalTest, AreaAscending) {
+    Terminal* test = new Terminal("Triangle (-2,0,0,3,2,0) Triangle (-2,0,0,6,2,0) area inc");
+    ASSERT_EQ("[6.000000, 12.000000]", test->showResult());
+}
+
+TEST(TerminalTest, SumOfSquaresAscending) {
+    Terminal* test = new Terminal("Ellipse (3, 4) CircularSector (10, 60) Triangle (0, 0, 6, 0, 3, 3) sumOfSquares inc");
+    ASSERT_EQ("[290.823376, 1867.815786, 3670.098070]", test->showResult());
+}
+
+TEST(TerminalTest, InvalidArgumentNumber) {
+    Terminal* test = new Terminal("Triangle (-2,0,0,3,2,0,1) Triangle (-2,0,0,6,2,0) area inc");
+    ASSERT_EQ("[12.000000]", test->showResult());
+    Terminal* test2 = new Terminal("Ellipse (6,5) Triangle (3,0,0) CircularSector (8,40) area inc");
+    ASSERT_EQ("[22.340214, 94.247780]", test2->showResult());
+}
+
+TEST(TerminalTest, UnusefulInput) {
+    try {
+        Terminal* test = new Terminal("Ellipse(6,5) triangle(-3,0,0,2,3,0) CircularSector(8,40) area");
+    } catch (string exception) {
+        ASSERT_EQ(string("Unuseful User Input!"), exception);
+    }
+    try {
+        Terminal* test2 = new Terminal("Ellipse(6,5) triangle(-3,0,0,2,3,0) CircularSector(8,40) inc");
+    } catch (string exception) {
+        ASSERT_EQ(string("Unuseful User Input!"), exception);
+    }
+    try {
+        Terminal* test3 = new Terminal("Ellipse(6,5) triangle(3,0,0,2,-3,0) CircularSector(8,40)");
+    } catch (string exception) {
+        ASSERT_EQ(string("Unuseful User Input!"), exception);
+    }
+    try {
+        Terminal* test4 = new Terminal("area inc");
+    } catch (string exception) {
+        ASSERT_EQ(string("Unuseful User Input!"), exception);
+    }
+    try {
+        Terminal* test5 = new Terminal("inc");
+    } catch (string exception) {
+        ASSERT_EQ(string("Unuseful User Input!"), exception);
+    }
+    try {
+        Terminal* test6 = new Terminal("");
+    } catch (string exception) {
+        ASSERT_EQ(string("Unuseful User Input!"), exception);
+    }
 }
